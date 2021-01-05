@@ -1,9 +1,10 @@
-import { unstable_createRoot } from "react-dom";
+// eslint-disable-next-line camelcase
+import { unstable_createRoot } from 'react-dom';
 
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-const root = document.getElementById("root");
+const root = document.getElementById('root');
 unstable_createRoot(root).render(<App />);
 
 // If you want to start measuring performance in your app, pass a function

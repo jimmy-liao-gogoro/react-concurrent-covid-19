@@ -1,1 +1,1 @@
-export { default } from "./COVID19";
+export { default } from './COVID19';
