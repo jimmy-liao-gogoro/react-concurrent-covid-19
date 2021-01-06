@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import PropTypes from 'prop-types';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -25,16 +26,13 @@ const useStyles = makeStyles({
   },
 });
 
-const COUNT = 8;
-
-const COVID19Table = () => {
-  const url = 'https://storage.googleapis.com/covid19-open-data/v2/TW/main.json';
+const COVID19Table = ({ country }) => {
+  const url = `https://storage.googleapis.com/covid19-open-data/v2/${country}/main.json`;
   const {
     data: { data },
   } = useSWR(url, fetcher, config);
-  const { length } = data;
-  const res = data.slice(length - COUNT);
-  const country = res[0][5];
+  const res = data.slice().reverse();
+  const countryName = res[0][5];
 
   const classes = useStyles();
 
@@ -43,7 +41,7 @@ const COVID19Table = () => {
       <Grid item xs={9}>
         <TableContainer className={classes.tableContainer} component={Paper}>
           <Typography variant="h3" component="h3" gutterBottom>
-            {country}
+            {countryName}
           </Typography>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
@@ -77,6 +75,14 @@ const COVID19Table = () => {
       </Grid>
     </Grid>
   );
+};
+
+COVID19Table.propTypes = {
+  country: PropTypes.string,
+};
+
+COVID19Table.defaultProps = {
+  country: '',
 };
 
 export default COVID19Table;

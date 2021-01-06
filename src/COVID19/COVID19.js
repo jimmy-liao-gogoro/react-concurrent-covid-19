@@ -1,18 +1,17 @@
 import {
   AppBar,
   CircularProgress,
-  InputBase,
-  fade, makeStyles,
+  makeStyles,
   Toolbar,
   Typography,
+  FormControl,
+  Select,
+  MenuItem,
 } from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
 
 import { Suspense, useState } from 'react';
 
 import COVID19Table from './COVID19Table';
-
-const SEARCH_MAX_LENGTH = 20;
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -21,13 +20,11 @@ const useStyles = makeStyles((theme) => ({
       display: 'block',
     },
   },
-  search: {
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
-    },
     marginRight: theme.spacing(2),
     marginLeft: 0,
     width: '100%',
@@ -36,39 +33,14 @@ const useStyles = makeStyles((theme) => ({
       width: 'auto',
     },
   },
-  searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inputRoot: {
-    color: 'inherit',
-  },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
 }));
 
 const COVID19 = () => {
   const classes = useStyles();
-  const [search, setSearch] = useState('');
+  const [country, setCountry] = useState('TW');
 
-  const handleSearch = (e) => {
-    if (e.target.value.length > SEARCH_MAX_LENGTH) {
-      return;
-    }
-    setSearch(e.target.value);
+  const handleCountryChange = (e) => {
+    setCountry(e.target.value);
   };
 
   return (
@@ -78,25 +50,24 @@ const COVID19 = () => {
           <Typography variant="h6" className={classes.title}>
             React Concurrent COVID-19
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ 'aria-label': 'search' }}
-              value={search}
-              onChange={handleSearch}
-            />
-          </div>
+          <FormControl className={classes.formControl}>
+            <Select
+              labelId="label-country"
+              id="select-country"
+              value={country}
+              onChange={handleCountryChange}
+            >
+              <MenuItem value="TW">Taiwan</MenuItem>
+              <MenuItem value="US">United States of America</MenuItem>
+              <MenuItem value="CN">China</MenuItem>
+              <MenuItem value="JP">Japan</MenuItem>
+              <MenuItem value="KR">South Korea</MenuItem>
+            </Select>
+          </FormControl>
         </Toolbar>
       </AppBar>
       <Suspense fallback={<CircularProgress />}>
-        <COVID19Table />
+        <COVID19Table country={country} />
       </Suspense>
     </>
   );
