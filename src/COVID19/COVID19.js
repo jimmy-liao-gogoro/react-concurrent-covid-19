@@ -1,78 +1,104 @@
-import useSWR from 'swr';
-
-import { makeStyles } from '@material-ui/core/styles';
-
 import {
-  Grid,
+  AppBar,
+  CircularProgress,
+  InputBase,
+  fade, makeStyles,
+  Toolbar,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
 } from '@material-ui/core';
-import { fetcher, config } from '../util/swrSettings';
+import SearchIcon from '@material-ui/icons/Search';
 
-const useStyles = makeStyles({
-  tableContainer: {
-    padding: 12,
-  },
-  table: {
-    minWidth: 650,
-  },
-});
+import { Suspense, useState } from 'react';
 
-const COUNT = 8;
+import COVID19Table from './COVID19Table';
+
+const SEARCH_MAX_LENGTH = 20;
+
+const useStyles = makeStyles((theme) => ({
+  title: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block',
+    },
+  },
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(3),
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}));
 
 const COVID19 = () => {
-  const url = 'https://storage.googleapis.com/covid19-open-data/v2/TW/main.json';
-  const { data: { data } } = useSWR(url, fetcher, config);
-  const { length } = data;
-  const res = data.slice(length - COUNT);
-  const country = res[0][5];
-
   const classes = useStyles();
+  const [search, setSearch] = useState('');
+
+  const handleSearch = (e) => {
+    if (e.target.value.length > SEARCH_MAX_LENGTH) {
+      return;
+    }
+    setSearch(e.target.value);
+  };
 
   return (
-    <Grid container justify="center">
-      <Grid item xs={9}>
-        <TableContainer className={classes.tableContainer} component={Paper}>
-          <Typography variant="h3" component="h3" gutterBottom>
-            {country}
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" className={classes.title}>
+            React Concurrent COVID-19
           </Typography>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Total Confirmed</TableCell>
-                <TableCell>Total Deceased</TableCell>
-                <TableCell>Total Recovered</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {res.map((item) => (
-                <TableRow key={item[1]}>
-                  <TableCell component="th" scope="row">
-                    {item[1]}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {item[19]}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {item[20]}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {item[21]}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Grid>
-    </Grid>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ 'aria-label': 'search' }}
+              value={search}
+              onChange={handleSearch}
+            />
+          </div>
+        </Toolbar>
+      </AppBar>
+      <Suspense fallback={<CircularProgress />}>
+        <COVID19Table />
+      </Suspense>
+    </>
   );
 };
 
