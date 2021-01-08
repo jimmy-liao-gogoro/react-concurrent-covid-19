@@ -14,7 +14,6 @@ import {
   TableRow,
   Paper,
 } from '@material-ui/core';
-import { fetcher, config } from '../util/swrSettings';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -28,9 +27,7 @@ const useStyles = makeStyles({
 
 const COVID19Table = ({ country }) => {
   const url = `https://storage.googleapis.com/covid19-open-data/v2/${country}/main.json`;
-  const {
-    data: { data },
-  } = useSWR(url, fetcher, config);
+  const { data: { data } } = useSWR(url);
   const res = data.slice().reverse();
   const countryName = res[0][5];
 

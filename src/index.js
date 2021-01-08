@@ -1,10 +1,12 @@
 // eslint-disable-next-line camelcase
 import { unstable_createRoot } from 'react-dom';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { SWRConfig } from 'swr';
 
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { config } from './util/swrSettings';
 
 const theme = createMuiTheme({
   palette: {
@@ -14,9 +16,11 @@ const theme = createMuiTheme({
 
 const root = document.getElementById('root');
 unstable_createRoot(root).render(
-  <ThemeProvider theme={theme}>
-    <App />
-  </ThemeProvider>,
+  <SWRConfig value={config}>
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
+  </SWRConfig>,
 );
 
 // If you want to start measuring performance in your app, pass a function
