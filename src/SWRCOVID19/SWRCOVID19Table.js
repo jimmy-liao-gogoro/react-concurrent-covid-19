@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-unused-vars
+import React from 'react';
 import useSWR from 'swr';
 import PropTypes from 'prop-types';
 
@@ -13,6 +15,7 @@ import {
   TableHead,
   TableRow,
   Paper,
+  CircularProgress,
 } from '@material-ui/core';
 
 const useStyles = makeStyles({
@@ -23,13 +26,16 @@ const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
+  progress: {
+    marginLeft: 16,
+  },
 });
 
 const COUNT = 7;
 
 const SWRCOVID19Table = ({ country }) => {
   const url = `https://storage.googleapis.com/covid19-open-data/v2/${country}/main.json`;
-  const { data: { data } } = useSWR(url);
+  const { data: { data }, isValidating } = useSWR(url);
   const { length } = data;
   const slice = data.slice(length - COUNT - 1);
   slice.pop();
@@ -44,6 +50,9 @@ const SWRCOVID19Table = ({ country }) => {
         <TableContainer className={classes.tableContainer} component={Paper}>
           <Typography variant="h3" component="h3" gutterBottom>
             {countryName}
+            {isValidating ? (
+              <CircularProgress className={classes.progress} />
+            ) : null}
           </Typography>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
