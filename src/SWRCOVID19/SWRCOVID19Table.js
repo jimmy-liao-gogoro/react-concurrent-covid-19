@@ -25,10 +25,15 @@ const useStyles = makeStyles({
   },
 });
 
-const COVID19Table = ({ country }) => {
+const COUNT = 7;
+
+const SWRCOVID19Table = ({ country }) => {
   const url = `https://storage.googleapis.com/covid19-open-data/v2/${country}/main.json`;
   const { data: { data } } = useSWR(url);
-  const res = data.slice().reverse();
+  const { length } = data;
+  const slice = data.slice(length - COUNT - 1);
+  slice.pop();
+  const res = slice.reverse();
   const countryName = res[0][5];
 
   const classes = useStyles();
@@ -74,12 +79,12 @@ const COVID19Table = ({ country }) => {
   );
 };
 
-COVID19Table.propTypes = {
+SWRCOVID19Table.propTypes = {
   country: PropTypes.string,
 };
 
-COVID19Table.defaultProps = {
+SWRCOVID19Table.defaultProps = {
   country: '',
 };
 
-export default COVID19Table;
+export default SWRCOVID19Table;

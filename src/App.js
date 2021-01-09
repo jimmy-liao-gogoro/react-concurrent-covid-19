@@ -1,7 +1,5 @@
-import COVID19 from './COVID19';
+import SWRCOVID19 from './SWRCOVID19';
 
-const App = () => (
-  <COVID19 />
-);
+const App = () => <SWRCOVID19 />;
 
 export default App;

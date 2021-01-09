@@ -8,10 +8,14 @@ import {
   Select,
   MenuItem,
 } from '@material-ui/core';
+import { mutate, SWRConfig } from 'swr';
+import {
+  // eslint-disable-next-line camelcase
+  unstable_useTransition, Suspense, useState,
+} from 'react';
 
-import { Suspense, useState } from 'react';
-
-import COVID19Table from './COVID19Table';
+import { config } from '../util/swrSettings';
+import SWRCOVID19Table from './SWRCOVID19Table';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -38,13 +42,22 @@ const useStyles = makeStyles((theme) => ({
 const COVID19 = () => {
   const classes = useStyles();
   const [country, setCountry] = useState('TW');
+  const [startTransition, isPending] = unstable_useTransition({
+    timeoutMs: 1000,
+  });
 
   const handleCountryChange = (e) => {
-    setCountry(e.target.value);
+    const changedCountry = e.target.value;
+    setCountry(changedCountry);
+
+    startTransition(() => {
+      const url = `https://storage.googleapis.com/covid19-open-data/v2/${changedCountry}/main.json`;
+      mutate(url);
+    });
   };
 
   return (
-    <>
+    <SWRConfig value={config}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
@@ -55,6 +68,7 @@ const COVID19 = () => {
               labelId="label-country"
               id="select-country"
               value={country}
+              disabled={isPending}
               onChange={handleCountryChange}
             >
               <MenuItem value="TW">Taiwan</MenuItem>
@@ -67,9 +81,9 @@ const COVID19 = () => {
         </Toolbar>
       </AppBar>
       <Suspense fallback={<CircularProgress />}>
-        <COVID19Table country={country} />
+        <SWRCOVID19Table country={country} />
       </Suspense>
-    </>
+    </SWRConfig>
   );
 };
 
