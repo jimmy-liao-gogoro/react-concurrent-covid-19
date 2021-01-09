@@ -1,3 +1,7 @@
+// eslint-disable-next-line no-unused-vars
+import React, {
+  useTransition, Suspense, useState,
+} from 'react';
 import {
   AppBar,
   CircularProgress,
@@ -8,15 +12,10 @@ import {
   Select,
   MenuItem,
 } from '@material-ui/core';
-import {
-  // eslint-disable-next-line camelcase
-  unstable_useTransition, Suspense, useState,
-} from 'react';
 import { QueryClientProvider } from 'react-query';
 
 import queryClient from '../util/queryClient';
 import QueryCOVID19Table from './QueryCOVID19Table';
-// const QueryCOVID19Table = lazy(() => import('./QueryCOVID19Table'));
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -38,13 +37,17 @@ const useStyles = makeStyles((theme) => ({
       width: 'auto',
     },
   },
+  progress: {
+    marginTop: 16,
+    marginLeft: 16,
+  },
 }));
 
 const COVID19 = () => {
   const classes = useStyles();
   const [country, setCountry] = useState('TW');
-  const [startTransition, isPending] = unstable_useTransition({
-    timeoutMs: 1000,
+  const [startTransition, isPending] = useTransition({
+    timeoutMs: 1500,
   });
 
   const handleCountryChange = (e) => {
@@ -78,7 +81,7 @@ const COVID19 = () => {
           </FormControl>
         </Toolbar>
       </AppBar>
-      <Suspense fallback={<CircularProgress />}>
+      <Suspense fallback={<CircularProgress className={classes.progress} />}>
         <QueryCOVID19Table country={country} />
       </Suspense>
     </QueryClientProvider>
