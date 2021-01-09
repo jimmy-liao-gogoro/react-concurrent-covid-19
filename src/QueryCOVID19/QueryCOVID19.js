@@ -8,14 +8,15 @@ import {
   Select,
   MenuItem,
 } from '@material-ui/core';
-import { mutate, SWRConfig } from 'swr';
 import {
   // eslint-disable-next-line camelcase
   unstable_useTransition, Suspense, useState,
 } from 'react';
+import { QueryClientProvider } from 'react-query';
 
-import { config } from '../util/swrSettings';
+import queryClient from '../util/queryClient';
 import QueryCOVID19Table from './QueryCOVID19Table';
+// const QueryCOVID19Table = lazy(() => import('./QueryCOVID19Table'));
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -48,16 +49,13 @@ const COVID19 = () => {
 
   const handleCountryChange = (e) => {
     const changedCountry = e.target.value;
-    setCountry(changedCountry);
-
     startTransition(() => {
-      const url = `https://storage.googleapis.com/covid19-open-data/v2/${changedCountry}/main.json`;
-      mutate(url);
+      setCountry(changedCountry);
     });
   };
 
   return (
-    <SWRConfig value={config}>
+    <QueryClientProvider client={queryClient}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
@@ -83,7 +81,7 @@ const COVID19 = () => {
       <Suspense fallback={<CircularProgress />}>
         <QueryCOVID19Table country={country} />
       </Suspense>
-    </SWRConfig>
+    </QueryClientProvider>
   );
 };
 

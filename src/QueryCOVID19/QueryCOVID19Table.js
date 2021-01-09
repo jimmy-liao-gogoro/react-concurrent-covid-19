@@ -1,6 +1,5 @@
-import useSWR from 'swr';
 import PropTypes from 'prop-types';
-
+import { useQuery } from 'react-query';
 import { makeStyles } from '@material-ui/core/styles';
 
 import {
@@ -13,7 +12,10 @@ import {
   TableHead,
   TableRow,
   Paper,
+  CircularProgress,
 } from '@material-ui/core';
+
+import fetchCOVID19 from './fetchCOVID19';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -23,13 +25,16 @@ const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
+  progress: {
+    marginLeft: 16,
+  },
 });
 
 const COUNT = 7;
 
 const QueryCOVID19 = ({ country }) => {
-  const url = `https://storage.googleapis.com/covid19-open-data/v2/${country}/main.json`;
-  const { data: { data } } = useSWR(url);
+  const { data, isFetching } = useQuery(['covid-19', country], () => fetchCOVID19(country));
+
   const { length } = data;
   const slice = data.slice(length - COUNT - 1);
   slice.pop();
@@ -44,6 +49,9 @@ const QueryCOVID19 = ({ country }) => {
         <TableContainer className={classes.tableContainer} component={Paper}>
           <Typography variant="h3" component="h3" gutterBottom>
             {countryName}
+            {isFetching ? (
+              <CircularProgress className={classes.progress} />
+            ) : null}
           </Typography>
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
